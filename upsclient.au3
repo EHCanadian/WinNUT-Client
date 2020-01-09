@@ -1,14 +1,14 @@
 ﻿;**** Directives created by AutoIt3Wrapper_GUI ****
 #Region
 #AutoIt3Wrapper_Icon=images\upsicon.ico
-#AutoIt3Wrapper_Outfile=Build\upsclient_x86.exe
-#AutoIt3Wrapper_Outfile_x64=Build\upsclient_x64.exe
+#AutoIt3Wrapper_Outfile=Build\AutoItWinNutClient_x86.exe
+#AutoIt3Wrapper_Outfile_x64=Build\AutoItWinNutClient_x64.exe
 #AutoIt3Wrapper_UseUpx=y
 #AutoIt3Wrapper_Compile_Both=y
-#AutoIt3Wrapper_Res_Description=AutoItv3 Windows NUT Client. This is a NUT fork for monitoring a remote ups system that has network abilitys.
+#AutoIt3Wrapper_Res_Description=AutoIt Windows NUT Client. A WinNUT-Client fork for monitoring a remote ups system that has network abilities.
 #AutoIt3Wrapper_Res_Fileversion=1.7.2.2
-#AutoIt3Wrapper_Res_ProductName=AutoItv3 Windows NUT Client
-#AutoIt3Wrapper_Res_CompanyName=AutoItv3 Windows NUT Client
+#AutoIt3Wrapper_Res_ProductName=AutoIt Windows NUT Client
+#AutoIt3Wrapper_Res_CompanyName=AutoIt Windows NUT Client
 #AutoIt3Wrapper_Res_LegalCopyright=https://sourceforge.net/projects/winnutclient/
 #AutoIt3Wrapper_Res_LegalTradeMarks=https://github.com/gawindx/WinNUT-Client
 #AutoIt3Wrapper_Run_AU3Check=n
@@ -219,7 +219,7 @@ Func GetUPSData()
 	$ups_name = GetOption("upsname")
 	;
 	; Read the INI file for the value of 'Static Frequency Hertz' in the section labelled 'Appearance'.
-	Local $localstaticfrequencyhertz = IniRead(@ScriptDir & "\" & "ups.ini", "Appearance", "Static Frequency Hertz", "notsetstaticfrequencyhertz")
+	Local $localstaticfrequencyhertz = IniRead(@ScriptDir & "\" & "AutoItWinNutClient.ini", "Appearance", "Static Frequency Hertz", "notsetstaticfrequencyhertz")
 	;Add a $error check incase it wasn't set
 	;
 	;

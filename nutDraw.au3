@@ -1,5 +1,3 @@
-
-
 Global $painting = 0
 Global $clock_bkg = 0
 

@@ -1,6 +1,6 @@
 Global $errorstring = "no error"
 Global $haserror = 0
-Global $ProgramDesc = "Windows NUT Client"
+Global $ProgramDesc = "AutoIt WinNut Client"
 Global $ProgramVersion = ""
 
 Global $upsPF = 0.7
@@ -77,7 +77,7 @@ Global $LastSocket = 0
 
 ;nutOption
 Global $optionsStruct = 0
-Global $inipath = @ScriptDir & "\" & "ups.ini"
+Global $inipath = @ScriptDir & "\" & "AutoItWinNutClient.ini"
 Global $panel_bkg = 0
 Global $clock_bkg_bgr = 0
 Global $panel_bkg_bgr = 0
