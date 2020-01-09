@@ -1,4 +1,4 @@
-$optionList = "int port;int delay;char ipaddr[64];char upsname[64];int autoreconnect;"
+$optionList = "int port;int delay;char ipaddr[64];char upsname[64];int autoreconnect;int staticfrequencyhertz;"
 $optionList = $optionList & "int mininputv;int maxinputv;"
 $optionList = $optionList & "int minoutputv;int maxoutputv;"
 $optionList = $optionList & "int mininputf;int maxinputf;"
@@ -50,25 +50,25 @@ Func _ListFileInstallFolder($sSource, $sDest, $nFlag = 0, $sMask = '*', $sName =
 	If $sRet_FI_Lines = '' Then Return SetError(2, 0, '')
 	If $sOverWrite Then FileDelete(@ScriptDir & '\' & $sName & '.au3')
 	Return FileWrite(@ScriptDir & '\' & $sName & '.au3', StringStripWS($sRet_FI_Lines, 3))
-EndFunc
+EndFunc   ;==>_ListFileInstallFolder
 
 Func TimeToStr($TimeValue = 0)
-	Local $hourrtime, $minrtime, $secrtime,$TimeStr
-	
+	Local $hourrtime, $minrtime, $secrtime, $TimeStr
+
 	$hourrtime = Floor($TimeValue / 3600)
-	$minrtime = Floor(($TimeValue - ($hourrtime * 3600)) / 60 )
+	$minrtime = Floor(($TimeValue - ($hourrtime * 3600)) / 60)
 	$secrtime = $TimeValue - ($hourrtime * 3600) - ($minrtime * 60)
-	If ( $hourrtime > 23) Then
-		$dayrtime = Floor($hourrtime/24)
+	If ($hourrtime > 23) Then
+		$dayrtime = Floor($hourrtime / 24)
 		$hourrtime = $hourrtime - ($dayrtime * 24)
 		$TimeStr = StringFormat("%02dd%02dh:%02dm:%02ds", $dayrtime, $hourrtime, $minrtime, $secrtime)
-	ElseIf ( $hourrtime = 0 ) Then
+	ElseIf ($hourrtime = 0) Then
 		$TimeStr = StringFormat("%02dm:%02ds", $minrtime, $secrtime)
 	Else
 		$TimeStr = StringFormat("%02dh:%02dm:%02ds", $hourrtime, $minrtime, $secrtime)
 	EndIf
-	return $TimeStr
-EndFunc
+	Return $TimeStr
+EndFunc   ;==>TimeToStr
 
 Func _GetScriptVersion()
 	If @Compiled Then
@@ -81,94 +81,94 @@ Func _GetScriptVersion()
 		If @error Then Return SetError(2, 0, "0.0.0.0")
 		Return $asRet[0]
 	EndIf
-EndFunc
+EndFunc   ;==>_GetScriptVersion
 
 Func Reset_Shutdown_Timer()
 	$Active_Countdown = 0
 	Update_label()
-EndFunc
+EndFunc   ;==>Reset_Shutdown_Timer
 
 Func Init_Shutdown_Timer()
 	If Not $Active_Countdown Then
 		$Active_Countdown = 1
 		$en_cours = $ShutdownDelay
 		Update_label($en_cours)
-		AdlibRegister("Update_compteur",1000)
+		AdlibRegister("Update_compteur", 1000)
 	EndIf
-EndFunc
+EndFunc   ;==>Init_Shutdown_Timer
 
-Func Update_label($param_string=0)
-	Local $nMin = Floor($param_string/60)
-	Local $nSec = $param_string - $nMin*60
-	GUICtrlSetData($lbl_countdown, StringFormat("%02d:%02d", $nMin,$nSec))
+Func Update_label($param_string = 0)
+	Local $nMin = Floor($param_string / 60)
+	Local $nSec = $param_string - $nMin * 60
+	GUICtrlSetData($lbl_countdown, StringFormat("%02d:%02d", $nMin, $nSec))
 	GUICtrlSetData($lbl_ups_status, StringFormat("Battery Charge : %02d\r\nRemaining Time : %s", $battCh, $battrtimeStr))
-EndFunc
+EndFunc   ;==>Update_label
 
 Func _Restart_Compteur($hWnd, $iMsg, $iIDTimer, $iTime)
-	AdlibRegister("Update_compteur",1000)
+	AdlibRegister("Update_compteur", 1000)
 	$Suspend_Countdown = 0
 	GUICtrlSetColor($lbl_countdown, 0x000000)
-EndFunc
+EndFunc   ;==>_Restart_Compteur
 
 ;==== Fonction principale de gestion du compteur
 Func Update_compteur()
 	If $Active_Countdown Then
 		$en_cours -= 1
 		Update_label($en_cours)
-		If $en_cours = 0 Then AdlibUnregister("Update_compteur")
+		If $en_cours = 0 Then AdlibUnRegister("Update_compteur")
 	EndIf
-EndFunc
+EndFunc   ;==>Update_compteur
 
 Func InitOptionDATA()
 	$optionsStruct = 0 ;reset the variable if was inited earlier
 	$optionsStruct = DllStructCreate($optionList)
-	if IsDllStruct($optionsStruct) == 0 Then
+	If IsDllStruct($optionsStruct) == 0 Then
 		$status = -1
 		Return
 	EndIf
 	$status = 0
 	Return
-EndFunc
+EndFunc   ;==>InitOptionDATA
 
 Func IsShutdownCondition()
-	If ($upsstatus <> "0") and ($upsstatus <> "OL" and $socket <> 0) Then
-		If ($battCh < GetOption("shutdownpcbatt")) and ($battruntime < GetOption("shutdownpctime")) Then
-			return True
+	If ($upsstatus <> "0") And ($upsstatus <> "OL" And $socket <> 0) Then
+		If ($battCh < GetOption("shutdownpcbatt")) And ($battruntime < GetOption("shutdownpctime")) Then
+			Return True
 		EndIf
 	EndIf
-	return False
-EndFunc
+	Return False
+EndFunc   ;==>IsShutdownCondition
 
 Func GetOption($optionName)
-	$result = DllStructGetData($optionsStruct, $optionName);
-	if ($result == 0) Then
-		if @error <> 0 Then
-			return -1
+	$result = DllStructGetData($optionsStruct, $optionName) ;
+	If ($result == 0) Then
+		If @error <> 0 Then
+			Return -1
 		EndIf
 	Else
-		return $result
+		Return $result
 	EndIf
-	
-	return $result
-	
-EndFunc
 
-Func SetOption($optionName, $value, $type )
-	if $type == "string" Then
+	Return $result
+
+EndFunc   ;==>GetOption
+
+Func SetOption($optionName, $value, $type)
+	If $type == "string" Then
 		$value = String($value)
 	EndIf
-	
-	if $type == "number" Then
+
+	If $type == "number" Then
 		$value = Number($value)
 	EndIf
-	
-	$result = DllStructSetData($optionsStruct , $optionName , $value)
-	if $result == 0 and @error <> 0 Then
-		return -1
+
+	$result = DllStructSetData($optionsStruct, $optionName, $value)
+	If $result == 0 And @error <> 0 Then
+		Return -1
 	EndIf
-	
-	return $result
-EndFunc
+
+	Return $result
+EndFunc   ;==>SetOption
 
 ;This function reads parameters from ini file
 ;Used to read UPS connection settings
@@ -176,22 +176,22 @@ EndFunc
 ;If ini file is not found in script's directory , default values are set for connection
 ;settings of UPS
 Func Readparam($paramName, $sectionName, $type, $defaultValue, $iniName)
-	
-	$optionValue = IniRead($inipath , $sectionName,$iniName,"error")
-	if $optionValue == "error" Then 
-		SetOption( $paramName , $defaultValue , $type )
-		IniWrite($inipath , $sectionName,$iniName,GetOption($paramName))
-		return $defaultValue
+
+	$optionValue = IniRead($inipath, $sectionName, $iniName, "error")
+	If $optionValue == "error" Then
+		SetOption($paramName, $defaultValue, $type)
+		IniWrite($inipath, $sectionName, $iniName, GetOption($paramName))
+		Return $defaultValue
 	Else
-		SetOption( $paramName , $optionValue , $type )
-		return $optionValue
+		SetOption($paramName, $optionValue, $type)
+		Return $optionValue
 	EndIf
-	
-EndFunc
+
+EndFunc   ;==>Readparam
 
 Func ReadParams()
-	if FileExists($inipath) == 0 then ; file not created yet/doesn't exist
-									  ;then create ini file and write them to that file
+	If FileExists($inipath) == 0 Then ; file not created yet/doesn't exist
+		;then create ini file and write them to that file
 		$clock_bkg = String($gray)
 		$panel_bkg = String($gray)
 		SetOption("ipaddr", "nutserver host", "string")
@@ -204,11 +204,13 @@ Func ReadParams()
 		SetOption("minoutputv", 170, "number")
 		SetOption("maxoutputv", 270, "number")
 		SetOption("mininputf", 20, "number")
+		SetOption("mininputf", 20, "number")
 		SetOption("maxinputf", 70, "number")
 		SetOption("minupsl", 0, "number")
 		SetOption("maxupsl", 100, "number")
 		SetOption("minbattv", 0, "number")
 		SetOption("maxbattv", 20, "number")
+		SetOption("staticfrequencyhertz", 0, "number")
 		SetOption("minimizetray", 0, "number")
 		SetOption("startwithwindows", 0, "number")
 		SetOption("defaultlang", "en-US", "string")
@@ -223,49 +225,50 @@ Func ReadParams()
 		SetOption("GraceDelay", 15, "number")
 		WriteParams()
 	Else
-		Readparam("ipaddr", "Connection", "string" , "nutserver host" , "Server address")
-		Readparam("port", "Connection", "number" , "3493" , "Port")
-		Readparam("upsname", "Connection", "string" , "ups" , "UPS name")
-		Readparam("delay" , "Connection", "number" , "5000" , "Delay")
-		Readparam("autoreconnect" , "Connection" , "number" , "0" , "AutoReconnect")
-		ReadParam("mininputv" , "Calibration" , "number" , "170" , "Min Input Voltage")
-		ReadParam("maxinputv" , "Calibration" , "number" , "270" , "Max Input Voltage")
-		ReadParam("minoutputv" , "Calibration" , "number" , "170" , "Min Output Voltage")
-		ReadParam("maxoutputv" , "Calibration" , "number" , "270" , "Max Output Voltage")
-		ReadParam("mininputf" , "Calibration" , "number" , "20" , "Min Input Frequency")
-		ReadParam("maxinputf" , "Calibration" , "number" , "70" , "Max Input Frequency")
-		ReadParam("minupsl" , "Calibration" , "number" , "0" , "Min UPS Load")
-		ReadParam("maxupsl" , "Calibration" , "number" , "100" , "Max UPS Load")
-		ReadParam("minbattv" , "Calibration" , "number" , "0" , "Min Batt Voltage")
-		ReadParam("maxbattv" , "Calibration" , "number" , "20" , "Max Batt Voltage")
-		ReadParam("minimizetray" , "Appearance" , "number" , "0" , "Minimize to tray")
-		ReadParam("closetotray" , "Appearance" , "number" , "0" , "Close to tray")
-		ReadParam("minimizeonstart" , "Appearance" , "number" , "0" , "Minimize on Start")
-		ReadParam("startwithwindows" , "Appearance" , "number" , "0" , "Start with Windows")
-		ReadParam("defaultlang", "Appearance", "string" , "en-US" , "Default Language")
-		ReadParam("language", "Appearance", "string" , "system" , "Language")
-		ReadParam("shutdownpcbatt" , "Power" , "number" , "30" , "Shutdown Limit Battery Charge")
-		ReadParam("shutdownpctime" , "Power" , "number" , "120" , "Shutdown Limit UPS Remain Time")
-		ReadParam("InstantShutdown" , "Power" , "number" , "1" , "Shutdown Immediately")
-		ReadParam("ShutdownDelay" , "Power" , "number" , "15" , "Delay To Shutdown")
-		ReadParam("AllowGrace" , "Power" , "number" , "0" , "Allow Extended Shutdown Delay")
-		ReadParam("GraceDelay" , "Power" , "number" , "15" , "Extended Shutdown Delay")
-		$clock_bkg = IniRead($inipath , "Colors","Clocks Color","error")
+		Readparam("ipaddr", "Connection", "string", "nutserver host", "Server address")
+		Readparam("port", "Connection", "number", "3493", "Port")
+		Readparam("upsname", "Connection", "string", "ups", "UPS name")
+		Readparam("delay", "Connection", "number", "5000", "Delay")
+		Readparam("autoreconnect", "Connection", "number", "0", "AutoReconnect")
+		Readparam("mininputv", "Calibration", "number", "170", "Min Input Voltage")
+		Readparam("maxinputv", "Calibration", "number", "270", "Max Input Voltage")
+		Readparam("minoutputv", "Calibration", "number", "170", "Min Output Voltage")
+		Readparam("maxoutputv", "Calibration", "number", "270", "Max Output Voltage")
+		Readparam("mininputf", "Calibration", "number", "20", "Min Input Frequency")
+		Readparam("maxinputf", "Calibration", "number", "70", "Max Input Frequency")
+		Readparam("minupsl", "Calibration", "number", "0", "Min UPS Load")
+		Readparam("maxupsl", "Calibration", "number", "100", "Max UPS Load")
+		Readparam("minbattv", "Calibration", "number", "0", "Min Batt Voltage")
+		Readparam("maxbattv", "Calibration", "number", "20", "Max Batt Voltage")
+		Readparam("staticfrequencyhertz", "Appearance", "number", "0", "Static Frequency Hertz")
+		Readparam("minimizetray", "Appearance", "number", "0", "Minimize to tray")
+		Readparam("closetotray", "Appearance", "number", "0", "Close to tray")
+		Readparam("minimizeonstart", "Appearance", "number", "0", "Minimize on Start")
+		Readparam("startwithwindows", "Appearance", "number", "0", "Start with Windows")
+		Readparam("defaultlang", "Appearance", "string", "en-US", "Default Language")
+		Readparam("language", "Appearance", "string", "system", "Language")
+		Readparam("shutdownpcbatt", "Power", "number", "30", "Shutdown Limit Battery Charge")
+		Readparam("shutdownpctime", "Power", "number", "120", "Shutdown Limit UPS Remain Time")
+		Readparam("InstantShutdown", "Power", "number", "1", "Shutdown Immediately")
+		Readparam("ShutdownDelay", "Power", "number", "15", "Delay To Shutdown")
+		Readparam("AllowGrace", "Power", "number", "0", "Allow Extended Shutdown Delay")
+		Readparam("GraceDelay", "Power", "number", "15", "Extended Shutdown Delay")
+		$clock_bkg = IniRead($inipath, "Colors", "Clocks Color", "error")
 
-		if $clock_bkg == "error" Then
+		If $clock_bkg == "error" Then
 			$clock_bkg = $gray
-			IniWrite($inipath , "Colors","Clocks Color" , "0x" & Hex($clock_bkg))
+			IniWrite($inipath, "Colors", "Clocks Color", "0x" & Hex($clock_bkg))
 		Else
 			$clock_bkg = Number($clock_bkg)
 		EndIf
 		$clock_bkg = Number($clock_bkg)
 		$clock_bkg_bgr = RGBtoBGR($clock_bkg)
 		;;;;;;;;;;;;;;;;;;;;;;;;;;
-		$panel_bkg = IniRead($inipath , "Colors","Panel Color","error")
-		
-		if $panel_bkg == "error" Then
+		$panel_bkg = IniRead($inipath, "Colors", "Panel Color", "error")
+
+		If $panel_bkg == "error" Then
 			$panel_bkg = $gray
-			IniWrite($inipath , "Colors","Panel Color" , "0x" & Hex($panel_bkg))
+			IniWrite($inipath, "Colors", "Panel Color", "0x" & Hex($panel_bkg))
 		Else
 			$panel_bkg = Number($panel_bkg)
 		EndIf
@@ -274,7 +277,7 @@ Func ReadParams()
 
 	EndIf
 	;WriteLog("Done")
-EndFunc
+EndFunc   ;==>ReadParams
 
 ;This function writes parameters to ini file
 ;This is after these were set in the gui and apply or OK button was hit there
@@ -286,6 +289,7 @@ Func WriteParams()
 	IniWrite($inipath, "Connection", "AutoReconnect", GetOption("autoreconnect"))
 	IniWrite($inipath, "Colors", "Clocks Color", "0x" & Hex($clock_bkg))
 	IniWrite($inipath, "Colors", "Panel Color", "0x" & Hex($panel_bkg))
+	IniWrite($inipath, "Appearance", "Static Frequency Hertz", GetOption("staticfrequencyhertz"))
 	IniWrite($inipath, "Appearance", "Minimize to tray", GetOption("minimizetray"))
 	IniWrite($inipath, "Appearance", "Close to tray", GetOption("closetotray"))
 	IniWrite($inipath, "Appearance", "Minimize on Start", GetOption("minimizeonstart"))
@@ -308,4 +312,4 @@ Func WriteParams()
 	IniWrite($inipath, "Calibration", "Max UPS Load", GetOption("maxupsl"))
 	IniWrite($inipath, "Calibration", "Min Batt Voltage", GetOption("minbattv"))
 	IniWrite($inipath, "Calibration", "Max Batt Voltage", GetOption("maxbattv"))
-EndFunc
+EndFunc   ;==>WriteParams
